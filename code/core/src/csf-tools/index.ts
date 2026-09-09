@@ -1,4 +1,12 @@
 export * from './CsfFile.ts';
+export type {
+  CsfMutationDiagnostic,
+  CsfMutationDiagnosticCode,
+  CsfMutationResult,
+  CsfObject,
+  CsfObjectOptions,
+  CsfObjectTarget,
+} from './CsfObject.ts';
 export * from './ConfigFile.ts';
 export * from './jsdoc.ts';
 export * from './enrichCsf.ts';

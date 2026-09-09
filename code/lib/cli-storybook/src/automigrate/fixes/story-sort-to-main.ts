@@ -7,6 +7,7 @@ import { formatConfig, loadConfig } from 'storybook/internal/csf-tools';
 import picocolors from 'picocolors';
 import { dedent } from 'ts-dedent';
 
+import { findIndirectProperty, getStaticPropertyName } from '../helpers/config-object.ts';
 import type { Fix } from '../types.ts';
 
 interface StorySortToMainOptions {
@@ -46,16 +47,6 @@ const unwrapTypeScriptExpression = (node: t.Expression): t.Expression => {
     return unwrapTypeScriptExpression(node.expression);
   }
   return node;
-};
-
-const propertyKey = (property: t.ObjectProperty): string | undefined => {
-  if (t.isIdentifier(property.key) && !property.computed) {
-    return property.key.name;
-  }
-  if (t.isStringLiteral(property.key) && !property.computed) {
-    return property.key.value;
-  }
-  return undefined;
 };
 
 const findVariableInitialization = (config: ConfigFile, name: string) => {
@@ -370,7 +361,7 @@ const pathUsesIndirectValue = (node: t.Expression, path: string[]): boolean => {
   const [field, ...rest] = path;
   const values = expression.properties.flatMap((property) =>
     t.isObjectProperty(property) &&
-    propertyKey(property) === field &&
+    getStaticPropertyName(property) === field &&
     t.isExpression(property.value)
       ? [property.value]
       : []
@@ -441,12 +432,7 @@ const duplicatePreviewStorySortPathKey = (config: ConfigFile) => {
 };
 
 const objectContainsIndirectProperty = (node: t.Node | null | undefined) =>
-  t.isObjectExpression(node) &&
-  node.properties.some(
-    (property) =>
-      t.isSpreadElement(property) ||
-      ((t.isObjectProperty(property) || t.isObjectMethod(property)) && property.computed)
-  );
+  t.isObjectExpression(node) && findIndirectProperty(node) !== undefined;
 
 const previewStorySortPathContainsIndirectProperty = (config: ConfigFile) =>
   objectContainsIndirectProperty(config._exportsObject) ||
@@ -457,7 +443,7 @@ const previewStorySortPathContainsIndirectProperty = (config: ConfigFile) =>
 const removeRootField = (config: ConfigFile, name: string) => {
   if (config._exportsObject) {
     config._exportsObject.properties = config._exportsObject.properties.filter(
-      (property) => !t.isObjectProperty(property) || propertyKey(property) !== name
+      (property) => !t.isObjectProperty(property) || getStaticPropertyName(property) !== name
     );
   }
 

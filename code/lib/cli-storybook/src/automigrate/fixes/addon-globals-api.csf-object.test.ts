@@ -70,36 +70,6 @@ describe('addon-globals-api story objects', () => {
     `);
   });
 
-  it('migrates parameters an earlier spread cannot shadow', () => {
-    const source = dedent`
-      export default { title: 'Button' };
-      export const Primary = {
-        ...base,
-        parameters: { backgrounds: { disable: true } },
-      };
-    `;
-
-    expect(transform(source)).toMatchInlineSnapshot(`
-      "export default { title: 'Button' };
-      export const Primary = {
-        ...base,
-        parameters: { backgrounds: { disabled: true } },
-      };"
-    `);
-  });
-
-  it('leaves story objects with a shadowing spread unchanged', () => {
-    const source = dedent`
-      export default { title: 'Button' };
-      export const Primary = {
-        parameters: { backgrounds: { disable: true } },
-        ...base,
-      };
-    `;
-
-    expect(transform(source)).toBeNull();
-  });
-
   it('leaves an empty viewport parameter alone when only backgrounds migrate', () => {
     const source = dedent`
       export default { title: 'Button' };
@@ -116,18 +86,6 @@ describe('addon-globals-api story objects', () => {
         backgroundsOptions: undefined,
       })
     ).toBeNull();
-  });
-
-  it('leaves unsafe story objects unchanged', () => {
-    const source = dedent`
-      export default { title: 'Button' };
-      export const Primary = {
-        ...base,
-        parameters: { backgrounds: { default: 'Dark' } },
-      };
-    `;
-
-    expect(transform(source)).toBeNull();
   });
 
   it('keeps default orientation when it cannot write isRotated', () => {

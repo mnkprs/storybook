@@ -1,3 +1,8 @@
+## 10.6.1
+
+- Core: Fix build crash when ref reachability check fails mid-request - [#36181](https://github.com/storybookjs/storybook/pull/36181), thanks @shilman!
+- Telemetry: One tools-command record per invocation with CLI toolset and tool names - [#36210](https://github.com/storybookjs/storybook/pull/36210), thanks @kasperpeulen!
+
 ## 10.6.0
 
 > New skills architecture for agentic workflows
